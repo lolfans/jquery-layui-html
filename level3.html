@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>租车通-录入</title>
+    <link rel="stylesheet" href="layui/css/layui.css">
+</head>
+
+<style>
+    .body_all{
+        min-width: 360px;
+        max-width: 500px;
+        margin: 0 auto;
+        display:block;
+    }
+</style>
+<body style="background-color: #FCFCFC">
+<div class="body_all">
+    <div class="layui-carousel " id="test1"  style="margin: 0 auto">
+        <div carousel-item>
+            <div><img src="img/1.jpg" alt="" style="center top no-repeat"></div>
+            <div><img src="img/2.jpg" alt="" style="center top no-repeat"></div>
+            <div><img src="img/3.jpg" alt="" style="center top no-repeat"></div>
+            <div><img src="img/4.jpg" alt="" style="center top no-repeat"></div>
+        </div>
+    </div>
+    <hr>
+    <!--<div class="layui-container">-->
+    <form class="layui-form" action="">
+        <div style="color:#B766AD;text-align:center;" id="comment_add_or_last">欢迎广大用户补充租车商家信息，方便你我他！<a href="search.html" style="color:#0080FF">去搜索</a></div>
+        <hr>
+        <div class="layui-form-item">
+            <select name="province_id" id="province" lay-filter="province" lay-verify="required">
+            </select>
+            <select name="city_id" id="city" lay-filter="city" lay-verify="required">
+            </select>
+            <select name="district_id" id="district" lay-verify="required">
+            </select>
+        </div>
+
+        <div class="layui-form-item">
+            <input type="text" name="rent_shop_title" lay-verify="title" autocomplete="off" placeholder="请输入 租车商家名称" class="layui-input">
+        </div>
+        <div class="layui-form-item">
+            <input type="text" name="rent_shop_name" lay-verify="content" placeholder="请输入 租车商家联系人" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-item">
+            <input type="text" name="rent_shop_phone" lay-verify="phone" placeholder="请输入 联系人电话" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-item">
+            <input type="text" name="address" lay-verify="title" placeholder="请输入 商家具体地址" autocomplete="off" class="layui-input">
+        </div>
+        <div class="layui-form-item">
+            <input type="text" name="provider" placeholder="做好事，留个名" autocomplete="off" class="layui-input">
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block" style="text-align: center;margin: 0 auto">
+                <button class="layui-btn layui-btn-primary layui-btn-sm" lay-submit lay-filter="formDemo">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
+            </div>
+        </div>
+    </form>
+
+    <!--</div>-->
+</div>
+
+
+<script src="layui/layui.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script>
+
+    layui.use(['form', 'layedit'], function(){
+        var form = layui.form
+            ,layer = layui.layer
+
+        //页面加载就渲染省
+        $(document).ready(function () {
+            //重置三个默认值
+            $("#province").attr("value",-2);
+            $("#city").attr("value",-2);
+            $("#district").attr("value",-2);
+
+            var domain = "";
+            $.get(domain, {id:-1}, function (res) {
+
+                $("#province").html('');
+                $("#province").append($("<option/>").text('请选择省').attr("value", ''));
+
+                $.each(res.data, function(i, item){
+                    $("#province").append($("<option/>").text(item.areaName).attr("value",item.areaId));
+                });
+                form.render('select');
+
+            })
+        });
+
+        //监听渲染市
+        form.on('select(province)', function(data){
+            var id = data.value;
+            var domain = "";
+            $.get(domain, {id:id}, function (res) {
+
+                $("#city").html('');
+                $("#city").append($("<option/>").text('请选择市').attr("value", ''));
+
+                $.each(res.data, function(i, item){
+                    $("#city").append($("<option/>").text(item.areaName).attr("value",item.areaId));
+                });
+                form.render('select');
+
+            })
+            return false;
+        });
+
+
+        //监听渲染区县
+        form.on('select(city)', function(data){
+            var id = data.value;
+            var domain = "";
+            $.get(domain, {id:id}, function (res) {
+
+                $("#district").html('');
+                $("#district").append($("<option/>").text('请选择区县').attr("value", ''));
+
+                $.each(res.data, function(i, item){
+                    $("#district").append($("<option/>").text(item.areaName).attr("value",item.areaId));
+                });
+                form.render('select');
+            })
+            return false;
+        });
+
+
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 3){
+                    return '至少得3个字符啊';
+                }
+            }
+            ,phone: [/^1\d{10}$/, "请输入正确的手机号"]
+            ,pass: [/^[\S]{6,12}$/,'密码必须6到12位，且不能出现空格']
+            ,content: function(value){
+                if(value.length < 2){
+                    return '联系人至少得2个字符啊';
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(formDemo)', function(data){
+
+            var domain = "";
+            $.post(domain, data.field, function (res) {
+                if(res.status==200){
+                    layer.msg(res.msg,{icon:6,time: 2000});
+                }else{
+                    layer.msg(res.msg,{icon:5,time: 2000});
+                }
+
+            });
+            return false;
+        });
+    });
+
+    layui.use('carousel', function(){
+        var carousel = layui.carousel;
+        //建造实例
+        carousel.render({
+            elem: '#test1'
+            ,width: '100%' //设置容器宽度
+            ,height: '150px' //设置容器高度
+            ,arrow: 'always' //始终显示箭头
+        });
+    });
+</script>
+
+</body>
+</html>

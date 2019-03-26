@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="layui/css/layui.css">
+</head>
+<body>
+<div class="layui-input-inline" id="select_station1">
+    <select name="province" id="province" class="pcd" onchange="provice_change()">
+    </select>
+</div>
+<div class="layui-input-inline" id="select_station2">
+    <select name="city" id="city" class="pcd" onchange="city_change()">
+    </select>
+</div>
+<div class="layui-input-inline" id="select_station3" >
+    <select name="district" id="district" class="pcd">
+    </select>
+</div>
+<a href="javascript:void(0)" class="text-primary"  id="station_del" onclick="del_station(this)" station_id="{{$user->id}}" url="{{route('admin.station.destroy',$user->id)}}">删除</a>
+<script>
+    function del_station(obj) {
+        if(confirm('确定要删除么？')){
+            var station_id=$(obj).attr('station_id-url');
+            var url = $(obj).attr('url');
+            $.ajax({
+                url:url,
+                data:{_method: 'DELETE',_token:"{{csrf_token()}}"},
+                type:'delete',
+                dataType:'json',
+                success:function(res){
+                    alert('操作成功');
+                    window.location.reload();
+                },
+                error : function(XMLHttpRequest, textStatus, errorThrown) {
+                    console.log('失败');
+                }
+            });
+        }
+        return false;
+    }
+    //省赋值
+    window.onload=function (){
+        $("#province").attr("value",0);
+        $("#city").attr("value",0);
+        $("#district").attr("value",0);
+
+        var parent_id = 0;
+        $.ajax({
+            url:"{{route('admin.districts')}}",
+            data:{_method: 'get',_token:"{{csrf_token()}}","parent_id":parent_id},
+            type:'get',
+            dataType:'json',
+            success:function(res){
+                $("#province").html('');
+                $("#province").append($("<option/>").text('请选择').attr("value", 0));
+                $.each(res, function(i, item){
+                    $("#province").append($("<option/>").text(item.name).attr("value",item.id));
+                });
+
+            },
+            error : function(XMLHttpRequest, textStatus, errorThrown) {
+                console.log('失败');
+            }
+        });
+
+    }
+
+    //城市赋值
+    function provice_change() {
+        var parent_id = $("#province option:selected").val();
+        $.ajax({
+            url: "{{route('admin.districts')}}",
+            data: {_method: 'get', _token: "{{csrf_token()}}", "parent_id": parent_id},
+            type: 'get',
+            dataType: 'json',
+            success: function (res) {
+                console.log(res);
+                $("#city").html('');
+                $("#city").append($("<option/>").text('请选择').attr("value",-1));
+                $("#district").html('');
+                $("#district").append($("<option/>").text('请选择').attr("value", -1));
+                $.each(res, function (i, item) {
+                    $("#city").append($("<option/>").text(item.name).attr("value", item.id));
+                });
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log('失败');
+            }
+        });
+    }
+
+    //区县赋值
+
+    //城市赋值
+    function city_change() {
+        var parent_id = $("#city option:selected").val();
+        $.ajax({
+            url: "{{route('admin.districts')}}",
+            data: {_method: 'get', _token: "{{csrf_token()}}", "parent_id": parent_id},
+            type: 'get',
+            dataType: 'json',
+            success: function (res) {
+                $("#district").html('');
+                $("#district").append($("<option/>").text('请选择').attr("value", -1));
+                $.each(res, function (i, item) {
+                    $("#district").append($("<option/>").text(item.name).attr("value", item.id));
+                });
+
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                console.log('失败');
+            }
+        });
+    }
+
+</script>
+</body>
+</html>
