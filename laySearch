@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="erp2/public/layuiadmin/layui/css/layui.css">
+</head>
+<body>
+
+<form class="layui-form" action="">
+    <div class="layui-form-item">
+        <label class="layui-form-label">输入框</label>
+        <div class="layui-input-block">
+            <select name="sku" lay-verify="" lay-search id="pdSku">
+                <option value = "">请选择</option>
+            </select>
+        </div>
+
+    </div>
+
+
+</form>
+
+</body>
+<script src="erp2/public/layuiadmin/layui/layui.all.js"></script>
+
+<script >
+
+    //一般直接写在一个js文件中
+    layui.use(['layer', 'form'], function(){
+        var layer = layui.layer
+                ,$ = layui.$
+                ,form = layui.form;
+
+
+        //赋值部分
+       var data = [
+            {name: "tina", age: 14},
+            {name: "timo", age: 15},
+            {name: "lily", age: 16},
+            {name: "lucy", age: 16}
+        ];
+        var htmls = '<option value = "">请选择</option>';
+        $.each(data, function (index, item) {
+            htmls += '<option value = "' + item.age + '">' + item.name + '</option>';
+        });
+        $("#pdSku").html(htmls);
+
+        form.render('select');
+
+
+    });
+
+
+
+</script>
+
+</html>
